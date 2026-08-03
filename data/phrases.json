@@ -1,0 +1,442 @@
+{
+  "phrases": [
+    {
+      "es": "Hola, ¿cómo estás?",
+      "kr_read": "올라, 꼬모 에스따스",
+      "ko": "안녕하세요, 어떻게 지내세요?",
+      "scene": "친구·또래에게 인사할 때",
+      "tip": "격식을 차릴 땐 estás 대신 está 를 씁니다.",
+      "parts": [
+        { "kr": "올라", "es": "Hola", "ko": "안녕" },
+        { "kr": "꼬모 에스따스", "es": "¿cómo estás?", "ko": "어떻게 지내?" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "Mucho gusto",
+      "kr_read": "무초 구스또",
+      "ko": "만나서 반갑습니다",
+      "scene": "처음 만났을 때",
+      "tip": "악수하면서 말하면 자연스럽습니다.",
+      "parts": [
+        { "kr": "무초", "es": "Mucho", "ko": "많이" },
+        { "kr": "구스또", "es": "gusto", "ko": "기쁨, 반가움" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "Por favor",
+      "kr_read": "뽀르 파보르",
+      "ko": "부탁합니다",
+      "scene": "무엇을 부탁할 때 어디서나",
+      "tip": "문장 끝에 붙이면 훨씬 정중하게 들립니다.",
+      "parts": [
+        { "kr": "뽀르", "es": "Por", "ko": "~을 위해" },
+        { "kr": "파보르", "es": "favor", "ko": "호의" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "Gracias, de nada",
+      "kr_read": "그라시아스, 데 나다",
+      "ko": "감사합니다, 천만에요",
+      "scene": "감사 인사를 주고받을 때",
+      "tip": "정말 고마울 땐 muchas gracias 라고 강조합니다.",
+      "parts": [
+        { "kr": "그라시아스", "es": "Gracias", "ko": "감사합니다" },
+        { "kr": "데 나다", "es": "de nada", "ko": "천만에요" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "Lo siento",
+      "kr_read": "로 시엔또",
+      "ko": "죄송합니다, 유감이에요",
+      "scene": "실수했거나 미안할 때",
+      "tip": "가벼운 실례에는 perdón 도 자주 씁니다.",
+      "parts": [
+        { "kr": "로", "es": "Lo", "ko": "그것을" },
+        { "kr": "시엔또", "es": "siento", "ko": "(유감으로) 느낍니다" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "No hablo español muy bien",
+      "kr_read": "노 아블로 에스빠뇰 무이 비엔",
+      "ko": "스페인어를 잘 못해요",
+      "scene": "의사소통이 어려울 때",
+      "tip": "Más despacio, por favor(천천히 말해주세요)를 이어 말하면 좋습니다.",
+      "parts": [
+        { "kr": "노", "es": "No", "ko": "아니다" },
+        { "kr": "아블로", "es": "hablo", "ko": "나는 말한다" },
+        { "kr": "에스빠뇰", "es": "español", "ko": "스페인어를" },
+        { "kr": "무이 비엔", "es": "muy bien", "ko": "아주 잘" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "¿Dónde está la puerta de embarque?",
+      "kr_read": "돈데 에스따 라 뿌에르따 데 엠바르께",
+      "ko": "탑승구가 어디예요?",
+      "scene": "공항에서 탑승구를 찾을 때",
+      "tip": "puerta 뒤에 게이트 번호를 붙여 물어봐도 됩니다.",
+      "parts": [
+        { "kr": "돈데 에스따", "es": "¿Dónde está", "ko": "어디에 있어요" },
+        { "kr": "라 뿌에르따 데 엠바르께", "es": "la puerta de embarque?", "ko": "탑승구가" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "He perdido mi maleta",
+      "kr_read": "에 뻬르디도 미 말레따",
+      "ko": "제 캐리어(짐)를 잃어버렸어요",
+      "scene": "수하물을 분실했을 때",
+      "tip": "수하물 클레임 태그(영수증)를 보여주면 빨리 처리됩니다.",
+      "parts": [
+        { "kr": "에 뻬르디도", "es": "He perdido", "ko": "나는 잃어버렸다" },
+        { "kr": "미 말레따", "es": "mi maleta", "ko": "내 캐리어를" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "¿A qué hora sale el vuelo?",
+      "kr_read": "아 께 오라 살레 엘 부엘로",
+      "ko": "비행기가 몇 시에 출발하나요?",
+      "scene": "탑승 시간을 확인할 때",
+      "tip": "vuelo 는 '비행'이라는 뜻으로 항공편을 가리킵니다.",
+      "parts": [
+        { "kr": "아 께 오라", "es": "¿A qué hora", "ko": "몇 시에" },
+        { "kr": "살레", "es": "sale", "ko": "출발하나요" },
+        { "kr": "엘 부엘로", "es": "el vuelo?", "ko": "그 비행기가" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "¿Dónde puedo recoger mi equipaje?",
+      "kr_read": "돈데 뿌에도 레꼬헤르 미 에끼빠헤",
+      "ko": "짐을 어디서 찾을 수 있나요?",
+      "scene": "수하물 찾는 곳을 물어볼 때",
+      "tip": "equipaje 는 짐 전체를, maleta 는 캐리어 하나를 가리킵니다.",
+      "parts": [
+        { "kr": "돈데 뿌에도", "es": "¿Dónde puedo", "ko": "어디서 할 수 있나요" },
+        { "kr": "레꼬헤르", "es": "recoger", "ko": "찾다" },
+        { "kr": "미 에끼빠헤", "es": "mi equipaje?", "ko": "내 짐을" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "Tengo algo que declarar",
+      "kr_read": "뗑고 알고 께 데끌라라르",
+      "ko": "신고할 물건이 있어요",
+      "scene": "세관에서 신고할 때",
+      "tip": "없으면 Nada que declarar(신고할 것 없어요)라고 답하면 됩니다.",
+      "parts": [
+        { "kr": "뗑고", "es": "Tengo", "ko": "나는 가지고 있다" },
+        { "kr": "알고 께 데끌라라르", "es": "algo que declarar", "ko": "신고할 무언가를" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "¿Puedo pasar aquí con esta maleta?",
+      "kr_read": "뿌에도 빠사르 아끼 꼰 에스따 말레따",
+      "ko": "이 캐리어로 여기 지나가도 되나요?",
+      "scene": "보안검색대에서 수하물 규정을 확인할 때",
+      "tip": "esta 는 '이것'을 가리키는 여성형 지시사입니다.",
+      "parts": [
+        { "kr": "뿌에도 빠사르", "es": "¿Puedo pasar", "ko": "지나가도 되나요" },
+        { "kr": "아끼", "es": "aquí", "ko": "여기를" },
+        { "kr": "꼰 에스따 말레따", "es": "con esta maleta?", "ko": "이 캐리어를 가지고" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "Tengo una reserva a nombre de...",
+      "kr_read": "뗑고 우나 레세르바 아 놈브레 데...",
+      "ko": "...이름으로 예약했어요",
+      "scene": "숙소 체크인할 때",
+      "tip": "de 뒤에 여권에 적힌 이름을 그대로 말하면 됩니다.",
+      "parts": [
+        { "kr": "뗑고 우나 레세르바", "es": "Tengo una reserva", "ko": "나는 예약이 있다" },
+        { "kr": "아 놈브레 데...", "es": "a nombre de...", "ko": "~의 이름으로" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "¿A qué hora es el check-out?",
+      "kr_read": "아 께 오라 에스 엘 체까웃",
+      "ko": "체크아웃이 몇 시예요?",
+      "scene": "체크아웃 시간을 확인할 때",
+      "tip": "check-out 은 영어 그대로 스페인어권에서도 널리 쓰입니다.",
+      "parts": [
+        { "kr": "아 께 오라", "es": "¿A qué hora", "ko": "몇 시에" },
+        { "kr": "에스 엘 체까웃", "es": "es el check-out?", "ko": "체크아웃인가요" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "¿Tiene wifi la habitación?",
+      "kr_read": "띠에네 위피 라 아비따시온",
+      "ko": "방에 와이파이 있나요?",
+      "scene": "객실 시설을 물어볼 때",
+      "tip": "wifi 는 스페인어에서도 '위피'로 발음합니다.",
+      "parts": [
+        { "kr": "띠에네 위피", "es": "¿Tiene wifi", "ko": "와이파이가 있나요" },
+        { "kr": "라 아비따시온", "es": "la habitación?", "ko": "그 방에" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "La ducha no funciona",
+      "kr_read": "라 두차 노 푼시오나",
+      "ko": "샤워기가 고장났어요",
+      "scene": "객실 시설 고장을 신고할 때",
+      "tip": "다른 물건엔 ducha 대신 고장난 것 이름만 바꿔서 씁니다.",
+      "parts": [
+        { "kr": "라 두차", "es": "La ducha", "ko": "그 샤워기가" },
+        { "kr": "노 푼시오나", "es": "no funciona", "ko": "작동하지 않는다" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "¿Puede darme una toalla más?",
+      "kr_read": "뿌에데 다르메 우나 또아야 마스",
+      "ko": "수건 하나 더 주실 수 있나요?",
+      "scene": "프런트에 물품을 요청할 때",
+      "tip": "toalla 자리에 다른 물건 이름을 넣어 응용할 수 있습니다.",
+      "parts": [
+        { "kr": "뿌에데 다르메", "es": "¿Puede darme", "ko": "저에게 주실 수 있나요" },
+        { "kr": "우나 또아야 마스", "es": "una toalla más?", "ko": "수건 하나 더" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "Quiero quedarme una noche más",
+      "kr_read": "끼에로 께다르메 우나 노체 마스",
+      "ko": "하루 더 묵고 싶어요",
+      "scene": "숙박 연장을 요청할 때",
+      "tip": "noche 자리 숫자를 바꿔 여러 날을 말할 수 있습니다.",
+      "parts": [
+        { "kr": "끼에로 께다르메", "es": "Quiero quedarme", "ko": "나는 머물고 싶다" },
+        { "kr": "우나 노체 마스", "es": "una noche más", "ko": "하룻밤 더" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "Una mesa para dos, por favor",
+      "kr_read": "우나 메사 빠라 도스, 뽀르 파보르",
+      "ko": "두 명 자리 부탁해요",
+      "scene": "식당 입구에서 자리를 요청할 때",
+      "tip": "dos 자리에 숫자를 바꿔 인원수를 말하면 됩니다.",
+      "parts": [
+        { "kr": "우나 메사", "es": "Una mesa", "ko": "테이블 하나" },
+        { "kr": "빠라 도스", "es": "para dos,", "ko": "두 명을 위한" },
+        { "kr": "뽀르 파보르", "es": "por favor", "ko": "부탁합니다" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "¿Qué me recomienda?",
+      "kr_read": "께 메 레꼬미엔다",
+      "ko": "뭘 추천해 주시겠어요?",
+      "scene": "메뉴를 고를 때",
+      "tip": "종업원에게 메뉴판을 가리키며 물으면 통합니다.",
+      "parts": [
+        { "kr": "께", "es": "¿Qué", "ko": "무엇을" },
+        { "kr": "메 레꼬미엔다", "es": "me recomienda?", "ko": "저에게 추천하시나요" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "La cuenta, por favor",
+      "kr_read": "라 꾸엔따, 뽀르 파보르",
+      "ko": "계산서 주세요",
+      "scene": "식사 후 계산을 요청할 때",
+      "tip": "손가락으로 허공에 글씨 쓰는 시늉을 함께 하면 잘 통합니다.",
+      "parts": [
+        { "kr": "라 꾸엔따", "es": "La cuenta,", "ko": "계산서를" },
+        { "kr": "뽀르 파보르", "es": "por favor", "ko": "부탁합니다" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "No como carne",
+      "kr_read": "노 꼬모 까르네",
+      "ko": "저는 고기를 안 먹어요",
+      "scene": "식단 제한(채식 등)을 안내할 때",
+      "tip": "생선은 괜찮다면 pero sí como pescado(하지만 생선은 먹어요)를 덧붙입니다.",
+      "parts": [
+        { "kr": "노 꼬모", "es": "No como", "ko": "나는 먹지 않는다" },
+        { "kr": "까르네", "es": "carne", "ko": "고기를" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "¿Tiene algo sin gluten?",
+      "kr_read": "띠에네 알고 신 글루뗀",
+      "ko": "글루텐 없는 음식 있나요?",
+      "scene": "알레르기·식이 제한을 확인할 때",
+      "tip": "sin 뒤에 다른 재료를 넣어 알레르기를 응용해 물을 수 있습니다.",
+      "parts": [
+        { "kr": "띠에네 알고", "es": "¿Tiene algo", "ko": "뭔가 있나요" },
+        { "kr": "신 글루뗀", "es": "sin gluten?", "ko": "글루텐 없이" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "Está delicioso",
+      "kr_read": "에스따 델리시오소",
+      "ko": "정말 맛있어요",
+      "scene": "음식이 맛있을 때 표현할 때",
+      "tip": "종업원이나 요리한 사람에게 웃으며 말하면 반가워합니다.",
+      "parts": [
+        { "kr": "에스따", "es": "Está", "ko": "그것은 (상태가)" },
+        { "kr": "델리시오소", "es": "delicioso", "ko": "맛있다" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "¿Cuánto cuesta esto?",
+      "kr_read": "꾸안또 꾸에스따 에스또",
+      "ko": "이거 얼마예요?",
+      "scene": "가격을 물어볼 때",
+      "tip": "물건을 손으로 가리키면서 물으면 확실합니다.",
+      "parts": [
+        { "kr": "꾸안또 꾸에스따", "es": "¿Cuánto cuesta", "ko": "얼마나 비용이 드나요" },
+        { "kr": "에스또", "es": "esto?", "ko": "이것은" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "¿Puedo probármelo?",
+      "kr_read": "뿌에도 쁘로바르멜로",
+      "ko": "이거 입어봐도 되나요?",
+      "scene": "옷가게에서 착용을 요청할 때",
+      "tip": "여성 옷은 probármela 로 바꿔 말합니다.",
+      "parts": [
+        { "kr": "뿌에도", "es": "¿Puedo", "ko": "해도 되나요" },
+        { "kr": "쁘로바르멜로", "es": "probármelo?", "ko": "그것을 입어보다" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "¿Tiene una talla más grande?",
+      "kr_read": "띠에네 우나 따야 마스 그란데",
+      "ko": "더 큰 사이즈 있나요?",
+      "scene": "사이즈 교환을 문의할 때",
+      "tip": "más grande 대신 más pequeña(더 작은)로 바꿔 쓸 수 있습니다.",
+      "parts": [
+        { "kr": "띠에네", "es": "¿Tiene", "ko": "있나요" },
+        { "kr": "우나 따야 마스 그란데", "es": "una talla más grande?", "ko": "더 큰 사이즈가" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "¿Aceptan tarjeta?",
+      "kr_read": "아셉딴 따르헤따",
+      "ko": "카드 받나요?",
+      "scene": "결제 수단을 확인할 때",
+      "tip": "현금만 받는 곳도 있어 미리 물어보면 편합니다.",
+      "parts": [
+        { "kr": "아셉딴", "es": "¿Aceptan", "ko": "받아들이나요" },
+        { "kr": "따르헤따", "es": "tarjeta?", "ko": "카드를" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "Solo estoy mirando, gracias",
+      "kr_read": "솔로 에스또이 미란도, 그라시아스",
+      "ko": "그냥 구경하는 거예요, 감사합니다",
+      "scene": "점원의 응대를 부드럽게 사양할 때",
+      "tip": "점원이 다가올 때 웃으며 말하면 자연스럽습니다.",
+      "parts": [
+        { "kr": "솔로 에스또이 미란도", "es": "Solo estoy mirando,", "ko": "그냥 나는 보고 있다" },
+        { "kr": "그라시아스", "es": "gracias", "ko": "감사합니다" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "¿Me puede hacer un descuento?",
+      "kr_read": "메 뿌에데 아세르 운 데스꾸엔또",
+      "ko": "할인해 주실 수 있나요?",
+      "scene": "가격을 흥정할 때",
+      "tip": "시장이나 소규모 상점에서 특히 잘 통합니다.",
+      "parts": [
+        { "kr": "메 뿌에데 아세르", "es": "¿Me puede hacer", "ko": "저에게 해주실 수 있나요" },
+        { "kr": "운 데스꾸엔또", "es": "un descuento?", "ko": "할인을" }
+      ],
+      "level": 2
+    },
+    {
+      "es": "¡Ayuda, por favor!",
+      "kr_read": "아유다, 뽀르 파보르",
+      "ko": "도와주세요!",
+      "scene": "위급 상황에서 도움을 요청할 때",
+      "tip": "큰 소리로 또박또박 말해야 주변에서 알아챕니다.",
+      "parts": [
+        { "kr": "아유다", "es": "¡Ayuda,", "ko": "도와줘요" },
+        { "kr": "뽀르 파보르", "es": "por favor!", "ko": "제발" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "Necesito un médico",
+      "kr_read": "네세시또 운 메디꼬",
+      "ko": "의사가 필요해요",
+      "scene": "아프거나 다쳤을 때",
+      "tip": "médico 대신 policía(경찰)로 바꿔 응용할 수 있습니다.",
+      "parts": [
+        { "kr": "네세시또", "es": "Necesito", "ko": "나는 필요하다" },
+        { "kr": "운 메디꼬", "es": "un médico", "ko": "의사 한 명이" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "Me duele aquí",
+      "kr_read": "메 두엘레 아끼",
+      "ko": "여기가 아파요",
+      "scene": "통증 부위를 알릴 때",
+      "tip": "아픈 곳을 손으로 짚으며 말하면 확실히 전달됩니다.",
+      "parts": [
+        { "kr": "메 두엘레", "es": "Me duele", "ko": "나는 아프다" },
+        { "kr": "아끼", "es": "aquí", "ko": "여기가" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "¿Dónde está el baño?",
+      "kr_read": "돈데 에스따 엘 바뇨",
+      "ko": "화장실이 어디예요?",
+      "scene": "화장실 위치를 물어볼 때",
+      "tip": "여행 중 가장 많이 쓰게 될 문장 중 하나입니다.",
+      "parts": [
+        { "kr": "돈데 에스따", "es": "¿Dónde está", "ko": "어디에 있나요" },
+        { "kr": "엘 바뇨", "es": "el baño?", "ko": "화장실이" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "Estoy perdido",
+      "kr_read": "에스또이 뻬르디도",
+      "ko": "저는 길을 잃었어요",
+      "scene": "길을 헤맬 때",
+      "tip": "여성이라면 perdida 로 어미를 바꿔 말합니다.",
+      "parts": [
+        { "kr": "에스또이", "es": "Estoy", "ko": "나는 ~한 상태다" },
+        { "kr": "뻬르디도", "es": "perdido", "ko": "길을 잃은" }
+      ],
+      "level": 1
+    },
+    {
+      "es": "¿Cómo llego a la estación?",
+      "kr_read": "꼬모 예고 아 라 에스따시온",
+      "ko": "역까지 어떻게 가나요?",
+      "scene": "대중교통 역을 찾아갈 때",
+      "tip": "estación 자리를 aeropuerto(공항) 등으로 바꿔 응용할 수 있습니다.",
+      "parts": [
+        { "kr": "꼬모 예고", "es": "¿Cómo llego", "ko": "어떻게 도착하나요" },
+        { "kr": "아 라 에스따시온", "es": "a la estación?", "ko": "역까지" }
+      ],
+      "level": 2
+    }
+  ]
+}

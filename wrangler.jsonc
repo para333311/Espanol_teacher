@@ -1,0 +1,37 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "spanish-teacher-bot",
+  "main": "src/index.js",
+  "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // 1시간마다 실행 (조용한 시간은 코드에서 걸러냄)
+  "triggers": {
+    "crons": ["0 * * * *"]
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "spanish-teacher-bot-db",
+      "database_id": "placeholder"
+    }
+  ],
+
+  "vars": {
+    "INTERVAL_HOURS": "1",
+    "TIMEZONE": "Asia/Seoul",
+    "QUIET_ENABLED": "true",
+    "QUIET_START_HOUR": "0",
+    "QUIET_END_HOUR": "7",
+    "SEND_VOICE": "true",
+    "SHOW_SPANISH": "false",
+    // 발음 음성 속도. "+0%" 가 원어민 보통 속도.
+    // 더 빠르게: "+15%" ~ "+30%" / 더 천천히: "-15%"
+    "VOICE_RATE": "+0%",
+    // es-MX-DaliaNeural(중남미·여성) 또는 es-MX-JorgeNeural(중남미·남성)
+    // 스페인 본토 발음을 원하면 es-ES-ElviraNeural(여성) / es-ES-AlvaroNeural(남성)
+    // (본토는 c/z 를 영어 th 처럼 발음해 한글 표기와 다르게 들릴 수 있음)
+    "VOICE_NAME": "es-MX-DaliaNeural"
+  }
+}

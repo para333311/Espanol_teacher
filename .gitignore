@@ -1,0 +1,16 @@
+# secrets
+.env
+*.env
+!.env.example
+
+# runtime state
+state/
+*.log
+__pycache__/
+*.pyc
+.venv/
+venv/
+.dev.vars
+node_modules/
+.wrangler/
+.secrets/

@@ -1,0 +1,171 @@
+name: Cloudflare 배포
+
+# 코드가 main 에 올라가면 자동으로 Cloudflare 에 배포된다.
+# Actions 탭에서 수동 실행(Run workflow)도 가능하다.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      DB_NAME: spanish-teacher-bot-db
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 의존성 설치
+        run: npm ci
+
+      # 시크릿은 셸에 직접 펼치지 않고 env 로만 넘긴다.
+      # 값에 따옴표·$ 같은 문자가 있어도 스크립트가 깨지지 않게 하기 위함이다.
+      - name: 필수 시크릿 확인
+        env:
+          CF: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          TG: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          WH: ${{ secrets.WEBHOOK_SECRET }}
+          AK: ${{ secrets.ADMIN_KEY }}
+        run: |
+          missing=""
+          [ -z "$CF" ] && missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -z "$TG" ] && missing="$missing TELEGRAM_BOT_TOKEN"
+          [ -z "$WH" ] && missing="$missing WEBHOOK_SECRET"
+          [ -z "$AK" ] && missing="$missing ADMIN_KEY"
+          if [ -n "$missing" ]; then
+            echo "::error::GitHub Secrets 가 비어 있습니다:$missing"
+            echo "저장소 Settings → Secrets and variables → Actions 에서 등록하세요."
+            exit 1
+          fi
+
+      # GitHub Secrets 는 복사-붙여넣기로 등록하는 경우가 많아 끝에 개행이나
+      # 공백이 섞여 들어가기 쉽다. 남아 있으면 텔레그램 API URL 이 깨지거나
+      # (curl 오류 3), Cloudflare 에 저장되는 값과 실제 비교하는 값이 미묘하게
+      # 달라져 인증이 어긋난다(403). 여기서 한 번만 정리해 이후 모든 단계가
+      # 같은 이름(CLOUDFLARE_API_TOKEN 등)으로 깨끗한 값을 쓰게 한다.
+      - name: 시크릿 공백 제거
+        env:
+          CF: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          TG: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          WH: ${{ secrets.WEBHOOK_SECRET }}
+          AK: ${{ secrets.ADMIN_KEY }}
+        run: |
+          set -euo pipefail
+          trim() { printf '%s' "$1" | tr -d '\r\n'; }
+          {
+            echo "CLOUDFLARE_API_TOKEN=$(trim "$CF")"
+            echo "TELEGRAM_BOT_TOKEN=$(trim "$TG")"
+            echo "WEBHOOK_SECRET=$(trim "$WH")"
+            echo "ADMIN_KEY=$(trim "$AK")"
+          } >> "$GITHUB_ENV"
+
+      # D1 데이터베이스가 없으면 만들고, 있으면 그대로 쓴다.
+      # 어느 쪽이든 실제 database_id 를 찾아 wrangler.jsonc 에 채워 넣는다.
+      - name: D1 데이터베이스 준비
+        id: d1
+        run: |
+          set -euo pipefail
+          # D1 권한이 없는 토큰이면 여기서 code 10000 으로 막힌다.
+          # "Edit Cloudflare Workers" 템플릿에는 D1 권한이 포함되지 않으므로
+          # 토큰에 Account → D1 → Edit 을 직접 추가해야 한다.
+          trap 'echo "::error::D1 접근 실패. CLOUDFLARE_API_TOKEN 에 Account → D1 → Edit 권한이 있는지 확인하세요."' ERR
+          if ! npx wrangler d1 list --json | jq -e --arg n "$DB_NAME" '.[] | select(.name==$n)' > /dev/null; then
+            echo "D1 데이터베이스가 없어 새로 만듭니다: $DB_NAME"
+            npx wrangler d1 create "$DB_NAME"
+          fi
+          DB_ID=$(npx wrangler d1 list --json | jq -r --arg n "$DB_NAME" '.[] | select(.name==$n) | .uuid')
+          if [ -z "$DB_ID" ] || [ "$DB_ID" = "null" ]; then
+            echo "::error::database_id 를 찾지 못했습니다."
+            exit 1
+          fi
+          echo "database_id: $DB_ID"
+          sed -i "s|\"database_id\": \"placeholder\"|\"database_id\": \"$DB_ID\"|" wrangler.jsonc
+
+      - name: DB 스키마 적용
+        run: |
+          set -euo pipefail
+          for f in migrations/*.sql; do
+            echo "적용: $f"
+            npx wrangler d1 execute "$DB_NAME" --remote --file="$f" --yes
+          done
+
+      # 시크릿 등록보다 배포가 먼저다. 워커가 아직 없는 상태에서
+      # `secret put` 을 하면 "새로 만들까요?" 프롬프트가 떠서 CI 가 멈춘다.
+      - name: 배포
+        id: publish
+        run: |
+          set -euo pipefail
+          npx wrangler deploy 2>&1 | tee deploy.log
+          # 배포 로그에서 워커 주소를 뽑아 다음 단계(웹훅 등록)에 넘긴다.
+          URL=$(grep -oE 'https://[a-zA-Z0-9._-]+\.workers\.dev' deploy.log | head -1)
+          echo "worker_url=$URL" >> "$GITHUB_OUTPUT"
+          echo "워커 주소: ${URL:-(찾지 못함)}"
+
+      # Cloudflare 쪽 시크릿을 GitHub Secrets 값으로 덮어쓴다(멱등).
+      # 시크릿은 재배포 없이 즉시 반영된다.
+      - name: Worker 시크릿 등록
+        env:
+          TG: ${{ env.TELEGRAM_BOT_TOKEN }}
+          WH: ${{ env.WEBHOOK_SECRET }}
+          AK: ${{ env.ADMIN_KEY }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$TG" | npx wrangler secret put TELEGRAM_BOT_TOKEN
+          printf '%s' "$WH" | npx wrangler secret put WEBHOOK_SECRET
+          printf '%s' "$AK" | npx wrangler secret put ADMIN_KEY
+
+      # 배포 후 텔레그램 웹훅을 새 주소로 다시 걸어준다.
+      #
+      # 우리 워커의 /setup(ADMIN_KEY 로 보호됨)을 거치는 대신 텔레그램
+      # API 를 CI 에서 직접 호출한다. 방금 올린 ADMIN_KEY 가 워커에 실제
+      # 반영됐는지에 기대지 않아도 되므로 그 경로의 변수 하나를 없앤다.
+      - name: 웹훅 등록
+        if: steps.publish.outputs.worker_url != ''
+        env:
+          TG: ${{ env.TELEGRAM_BOT_TOKEN }}
+          WH: ${{ env.WEBHOOK_SECRET }}
+          WORKER_URL: ${{ steps.publish.outputs.worker_url }}
+        run: |
+          set -euo pipefail
+          curl -sS --fail-with-body --max-time 60 \
+            --data-urlencode "url=${WORKER_URL}/webhook" \
+            --data-urlencode "secret_token=$WH" \
+            --data-urlencode 'allowed_updates=["message","channel_post","my_chat_member"]' \
+            "https://api.telegram.org/bot${TG}/setWebhook"
+          echo
+          curl -sS --fail-with-body --max-time 60 \
+            --data-urlencode 'commands=[
+              {"command":"now","description":"지금 바로 한 문장 받기"},
+              {"command":"again","description":"아무 문장 하나 더"},
+              {"command":"stats","description":"학습 진도 보기"},
+              {"command":"reset","description":"진도 초기화"},
+              {"command":"stop","description":"정기 발송 중지"},
+              {"command":"help","description":"도움말"}
+            ]' \
+            "https://api.telegram.org/bot${TG}/setMyCommands"
+          echo
+
+      - name: 배포 결과 요약
+        if: always()
+        run: |
+          {
+            echo "### 배포 결과"
+            echo ""
+            if [ -n "${{ steps.publish.outputs.worker_url }}" ]; then
+              echo "- 워커 주소: ${{ steps.publish.outputs.worker_url }}"
+              echo "- 텔레그램에서 봇에게 \`/now\` 를 보내 확인하세요."
+            else
+              echo "- 워커 주소를 찾지 못했습니다. 위 로그를 확인하세요."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
