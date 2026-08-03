@@ -1,0 +1,17 @@
+{
+  "name": "spanish-teacher-bot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:local": "for f in migrations/*.sql; do wrangler d1 execute spanish-teacher-bot-db --local --file=\"$f\"; done",
+    "db:remote": "for f in migrations/*.sql; do wrangler d1 execute spanish-teacher-bot-db --remote --file=\"$f\"; done",
+    "build:phrases": "python3 scripts/build_phrases.py",
+    "build:words": "python3 scripts/build_words.py"
+  },
+  "devDependencies": {
+    "wrangler": "^3.99.0"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "words": [
+    { "es": "equipaje", "kr_read": "에끼빠헤", "ko_reading": "짐, 수하물", "meaning": "여행 가방 등 부치는 짐 전체를 가리키는 말.", "scene": "체크인·수하물 찾는 곳" },
+    { "es": "pasaporte", "kr_read": "빠사뽀르떼", "ko_reading": "여권", "meaning": "해외 여행에 필요한 신분증명서.", "scene": "출입국 심사대" },
+    { "es": "vuelo", "kr_read": "부엘로", "ko_reading": "항공편, 비행", "meaning": "비행기 편명이나 운항을 가리키는 말.", "scene": "탑승 안내판" },
+    { "es": "aduana", "kr_read": "아두아나", "ko_reading": "세관", "meaning": "물품 반입을 검사하는 곳.", "scene": "입국장 세관 통과" },
+    { "es": "maleta", "kr_read": "말레따", "ko_reading": "캐리어(여행 가방)", "meaning": "바퀴 달린 여행용 가방.", "scene": "수하물 찾는 곳" },
+
+    { "es": "habitación", "kr_read": "아비따시온", "ko_reading": "방(객실)", "meaning": "호텔이나 숙소의 방.", "scene": "체크인·객실 안내" },
+    { "es": "recepción", "kr_read": "레셉시온", "ko_reading": "프런트, 리셉션", "meaning": "숙소 입구의 안내 데스크.", "scene": "체크인·문의할 때" },
+    { "es": "llave", "kr_read": "야베", "ko_reading": "열쇠", "meaning": "방문을 여는 열쇠나 카드키.", "scene": "체크인 후 방 열쇠 받을 때" },
+    { "es": "toalla", "kr_read": "또아야", "ko_reading": "수건", "meaning": "몸을 닦는 데 쓰는 천.", "scene": "객실 비품 요청" },
+    { "es": "desayuno", "kr_read": "데사유노", "ko_reading": "아침식사", "meaning": "하루의 첫 끼니.", "scene": "조식 포함 여부 확인" },
+
+    { "es": "menú", "kr_read": "메누", "ko_reading": "메뉴", "meaning": "음식 종류를 적어놓은 판.", "scene": "자리에 앉아 주문 준비" },
+    { "es": "cuenta", "kr_read": "꾸엔따", "ko_reading": "계산서", "meaning": "식사 후 지불할 금액이 적힌 종이.", "scene": "식사를 마치고 계산할 때" },
+    { "es": "propina", "kr_read": "쁘로삐나", "ko_reading": "팁", "meaning": "서비스에 대한 감사의 의미로 더 주는 돈.", "scene": "식당·택시 등에서 팁 문화 확인" },
+    { "es": "agua", "kr_read": "아구아", "ko_reading": "물", "meaning": "마시는 물.", "scene": "음료 주문할 때" },
+    { "es": "picante", "kr_read": "삐깐떼", "ko_reading": "매운", "meaning": "맵다는 뜻의 형용사.", "scene": "음식 맛 정도를 물을 때" },
+
+    { "es": "rebaja", "kr_read": "레바하", "ko_reading": "세일, 할인", "meaning": "가격을 낮춘 판매.", "scene": "세일 기간 쇼핑" },
+    { "es": "probador", "kr_read": "쁘로바도르", "ko_reading": "탈의실", "meaning": "옷을 입어보는 공간.", "scene": "옷가게에서 착용 요청 후" },
+    { "es": "efectivo", "kr_read": "에펙띠보", "ko_reading": "현금", "meaning": "지폐나 동전으로 된 돈.", "scene": "결제 수단을 말할 때" },
+    { "es": "talla", "kr_read": "따야", "ko_reading": "사이즈, 치수", "meaning": "옷이나 신발의 크기.", "scene": "옷 사이즈 문의" },
+    { "es": "recibo", "kr_read": "레시보", "ko_reading": "영수증", "meaning": "결제했다는 증명서.", "scene": "계산 후 환불·교환 대비" },
+
+    { "es": "hospital", "kr_read": "오스삐딸", "ko_reading": "병원", "meaning": "치료를 받는 의료 기관.", "scene": "아프거나 다쳤을 때" },
+    { "es": "farmacia", "kr_read": "파르마시아", "ko_reading": "약국", "meaning": "약을 사는 곳.", "scene": "간단한 약이 필요할 때" },
+    { "es": "policía", "kr_read": "뽈리시아", "ko_reading": "경찰", "meaning": "치안을 담당하는 공무원(또는 경찰서).", "scene": "도난·사고 신고" },
+    { "es": "izquierda", "kr_read": "이스끼에르다", "ko_reading": "왼쪽", "meaning": "방향을 나타내는 왼쪽.", "scene": "길 안내를 들을 때" },
+    { "es": "derecha", "kr_read": "데레차", "ko_reading": "오른쪽", "meaning": "방향을 나타내는 오른쪽.", "scene": "길 안내를 들을 때" },
+
+    { "es": "amigo", "kr_read": "아미고", "ko_reading": "친구(남성)", "meaning": "가까운 사이의 사람.", "scene": "누군가를 소개할 때" },
+    { "es": "trabajo", "kr_read": "뜨라바호", "ko_reading": "일, 직장", "meaning": "하는 일이나 직장.", "scene": "자기소개할 때" },
+    { "es": "tiempo", "kr_read": "띠엠뽀", "ko_reading": "시간, 날씨", "meaning": "문맥에 따라 시간 또는 날씨를 뜻함.", "scene": "시간이나 날씨를 물을 때" },
+    { "es": "familia", "kr_read": "파밀리아", "ko_reading": "가족", "meaning": "부모·형제 등 가까운 혈연.", "scene": "가족을 소개할 때" },
+    { "es": "dinero", "kr_read": "디네로", "ko_reading": "돈", "meaning": "화폐, 돈.", "scene": "비용을 이야기할 때" },
+
+    { "es": "embarazada", "kr_read": "엠바라사다", "ko_reading": "임신한", "guess_meaning": "영어 embarrassed(당황한)와 철자가 비슷해 착각하기 쉬움", "real_meaning": "임신한 (pregnant)" },
+    { "es": "actualmente", "kr_read": "악뚜알멘떼", "ko_reading": "현재", "guess_meaning": "영어 actually(사실은)와 비슷해 보여 착각하기 쉬움", "real_meaning": "현재, 요즘 (currently)" },
+    { "es": "éxito", "kr_read": "엑시또", "ko_reading": "성공", "guess_meaning": "영어 exit(출구)와 철자가 비슷해 착각하기 쉬움", "real_meaning": "성공 (success)" },
+    { "es": "constipado", "kr_read": "꼰스띠빠도", "ko_reading": "코감기", "guess_meaning": "영어 constipated(변비인)와 비슷해 보여 착각하기 쉬움", "real_meaning": "감기에 걸려 코가 막힌 (having a cold)" },
+    { "es": "sopa", "kr_read": "소빠", "ko_reading": "수프", "guess_meaning": "영어 soap(비누)와 발음이 비슷해 착각하기 쉬움", "real_meaning": "수프, 국물 요리 (soup)" },
+    { "es": "carpeta", "kr_read": "까르뻬따", "ko_reading": "폴더", "guess_meaning": "영어 carpet(카펫)과 철자가 비슷해 착각하기 쉬움", "real_meaning": "서류철, 폴더 (folder)" },
+    { "es": "ropa", "kr_read": "로빠", "ko_reading": "옷", "guess_meaning": "영어 rope(밧줄)와 발음이 비슷해 착각하기 쉬움", "real_meaning": "옷, 의류 (clothes)" },
+    { "es": "librería", "kr_read": "리브레리아", "ko_reading": "서점", "guess_meaning": "영어 library(도서관)와 철자가 비슷해 착각하기 쉬움", "real_meaning": "서점 (bookstore) — 도서관은 biblioteca" },
+    { "es": "sensible", "kr_read": "센시블레", "ko_reading": "예민한", "guess_meaning": "영어 sensible(분별있는)과 철자가 같아 착각하기 쉬움", "real_meaning": "예민한, 민감한 (sensitive)" },
+    { "es": "largo", "kr_read": "라르고", "ko_reading": "긴", "guess_meaning": "영어 large(큰)와 비슷해 보여 착각하기 쉬움", "real_meaning": "긴, 길이가 긴 (long) — '큰'은 grande" }
+  ]
+}

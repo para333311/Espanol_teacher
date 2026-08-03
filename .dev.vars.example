@@ -1,0 +1,4 @@
+# 로컬 개발용 시크릿 (실제 값은 .dev.vars 에 넣으세요)
+TELEGRAM_BOT_TOKEN=BotFather에서_받은_토큰
+WEBHOOK_SECRET=아무_임의_문자열
+ADMIN_KEY=아무_임의_문자열
