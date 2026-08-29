@@ -294,7 +294,7 @@ async function handleUpdate(env, cfg, tg, update) {
         await tg.sendMessage(
           chatId,
           "✅ 여기로 스페인어 문장을 보내겠습니다.\n" +
-            "1시간마다 한 문장씩 올라갑니다.",
+            `${cfg.intervalHours}시간마다 한 문장씩 올라갑니다.`,
         );
       }
     } else if (status === "left" || status === "kicked") {

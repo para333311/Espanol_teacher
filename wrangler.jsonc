@@ -5,9 +5,9 @@
   "compatibility_date": "2025-01-01",
   "compatibility_flags": ["nodejs_compat"],
 
-  // 1시간마다 실행 (조용한 시간은 코드에서 걸러냄)
+  // 3시간마다 실행 (조용한 시간은 코드에서 걸러냄)
   "triggers": {
-    "crons": ["0 * * * *"]
+    "crons": ["0 */3 * * *"]
   },
 
   "d1_databases": [
@@ -19,7 +19,7 @@
   ],
 
   "vars": {
-    "INTERVAL_HOURS": "1",
+    "INTERVAL_HOURS": "3",
     "TIMEZONE": "Asia/Seoul",
     "QUIET_ENABLED": "true",
     "QUIET_START_HOUR": "0",
