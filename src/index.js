@@ -7,6 +7,7 @@
 import { formatHelp, formatLesson, formatStart, formatStats, formatWord } from "./format.js";
 import {
   addSubscriber,
+  getLastSent,
   getProgress,
   getWordProgress,
   listSubscribers,
@@ -14,6 +15,7 @@ import {
   pickRandomContent,
   removeSubscriber,
   resetProgress,
+  saveLastSent,
 } from "./store.js";
 import { Telegram } from "./telegram.js";
 import { synthesizeSpanish } from "./tts.js";
@@ -172,6 +174,15 @@ async function broadcast(env, cfg, tg) {
         await removeSubscriber(env.DB, chatId);
         console.log(`더 이상 보낼 수 없어 구독 해제: ${chatId}`);
       }
+    }
+  }
+
+  // 클립 검색(daily-clip.yml)이 /today 로 읽어가도록 방금 나간 것을 남긴다.
+  if (sent > 0) {
+    try {
+      await saveLastSent(env.DB, kind, content);
+    } catch (e) {
+      console.warn("마지막 발송 기록 실패(발송은 됐음):", e.message);
     }
   }
 
@@ -398,6 +409,18 @@ export default {
         webhook: hookUrl,
         result: hook,
       });
+    }
+
+    // 오늘 나간 문장 + 발송 대상. daily-clip.yml(GitHub Actions)이 읽어
+    // 그 문장이 나오는 유튜브 클립을 찾아 영상으로 뒤따라 보낸다.
+    if (url.pathname === "/today") {
+      if (!isAdmin) return new Response("forbidden", { status: 403 });
+      const [last, subs] = await Promise.all([
+        getLastSent(env.DB),
+        listSubscribers(env.DB),
+      ]);
+      if (!last) return Response.json({ ok: false, reason: "발송 기록 없음" });
+      return Response.json({ ok: true, ...last, targets: subs });
     }
 
     if (url.pathname === "/status") {

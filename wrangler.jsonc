@@ -5,9 +5,11 @@
   "compatibility_date": "2025-01-01",
   "compatibility_flags": ["nodejs_compat"],
 
-  // 3시간마다 실행 (조용한 시간은 코드에서 걸러냄)
+  // 하루 1회, 낮 12시(KST) = 03:00 UTC. (2026-09-01, 3시간 간격에서 변경)
+  // 발송 뒤 GitHub Actions(daily-clip.yml)가 그 문장이 나오는 유튜브 클립을
+  // 찾아 영상으로 뒤따라 보낸다.
   "triggers": {
-    "crons": ["0 */3 * * *"]
+    "crons": ["0 3 * * *"]
   },
 
   "d1_databases": [
@@ -24,7 +26,9 @@
     "QUIET_ENABLED": "true",
     "QUIET_START_HOUR": "0",
     "QUIET_END_HOUR": "7",
-    "SEND_VOICE": "true",
+    // TTS mp3 는 그만 보낸다 — 대신 실제 영화·드라마 클립 영상이 따라간다
+    // (daily-clip.yml). 영상 쪽이 죽었을 때 되살리려면 "true" 로.
+    "SEND_VOICE": "false",
     "SHOW_SPANISH": "false",
     // 발음 음성 속도. "+0%" 가 원어민 보통 속도.
     // 더 빠르게: "+15%" ~ "+30%" / 더 천천히: "-15%"

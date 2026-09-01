@@ -163,3 +163,32 @@ export async function resetProgress(db) {
     .prepare("UPDATE progress SET round = 1, seen = '[]' WHERE id IN (1, 2)")
     .run();
 }
+
+// ------------------------------------------------------------ 마지막 발송
+//
+// daily-clip.yml(GitHub Actions)이 /today 로 읽어, 방금 나간 문장이 나오는
+// 유튜브 클립을 찾아 영상으로 뒤따라 보낸다.
+
+export async function saveLastSent(db, kind, content) {
+  await db
+    .prepare(
+      "INSERT INTO last_sent (id, kind, content_json, sent_at) " +
+        "VALUES (1, ?, ?, datetime('now')) " +
+        "ON CONFLICT(id) DO UPDATE SET kind = excluded.kind, " +
+        "content_json = excluded.content_json, sent_at = excluded.sent_at",
+    )
+    .bind(kind, JSON.stringify(content))
+    .run();
+}
+
+export async function getLastSent(db) {
+  const row = await db
+    .prepare("SELECT kind, content_json, sent_at FROM last_sent WHERE id = 1")
+    .first();
+  if (!row) return null;
+  try {
+    return { kind: row.kind, content: JSON.parse(row.content_json), sent_at: row.sent_at };
+  } catch {
+    return null;
+  }
+}

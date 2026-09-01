@@ -1,0 +1,39 @@
+name: 오늘 문장 클립 영상
+
+# 매일 12시(KST)에 워커가 문장 카드를 보낸 뒤, 그 문장이 실제로 들리는
+# 유튜브 클립을 찾아 영상으로 뒤따라 보낸다. (TTS mp3 대체, 2026-09-01)
+#
+# GitHub 예약은 혼잡하면 몇 시간씩 밀린다 — 그래도 카드는 워커 cron 이
+# 정시에 보내므로, 영상만 늦게 따라붙을 뿐 학습 흐름은 안 끊긴다.
+on:
+  schedule:
+    # 03:00 UTC(=KST 12:00) 워커 발송 직후를 노린다. 정각 혼잡을 피해 08분.
+    - cron: '8 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: daily-clip
+  cancel-in-progress: false
+
+jobs:
+  clip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: yt-dlp·ffmpeg 설치
+        run: |
+          pip install -U yt-dlp
+          sudo apt-get install -y -qq ffmpeg
+
+      - name: 클립 찾아 전송
+        env:
+          ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          PYTHONUNBUFFERED: '1'
+        run: python scripts/daily_clip.py
