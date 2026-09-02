@@ -136,6 +136,8 @@ def yt_search(query, n):
         "yt-dlp", "--flat-playlist", "--dump-json",
         "ytsearch%d:%s" % (n, query),
     ])
+    if r.returncode != 0:
+        log("  검색 실패:", r.stderr.decode("utf-8", "replace")[-400:])
     out = []
     for line in r.stdout.decode("utf-8", "replace").splitlines():
         try:
@@ -154,7 +156,7 @@ def fetch_subs(video_id):
     """스페인어 자막(vtt)을 내려받아 경로를 돌려준다. 없으면 None."""
     for f in glob.glob(os.path.join(WORKDIR, video_id + "*.vtt")):
         os.remove(f)
-    run([
+    r = run([
         "yt-dlp", "--skip-download",
         "--write-subs", "--write-auto-subs",
         "--sub-langs", "es.*,es",
@@ -163,6 +165,9 @@ def fetch_subs(video_id):
         "https://www.youtube.com/watch?v=" + video_id,
     ], timeout=120)
     hits = glob.glob(os.path.join(WORKDIR, video_id + "*.vtt"))
+    if not hits:
+        err = r.stderr.decode("utf-8", "replace").strip().splitlines()
+        log("  자막 없음: %s %s" % (video_id, err[-1][-200:] if err else ""))
     return hits[0] if hits else None
 
 
@@ -244,7 +249,7 @@ def main():
     if not today.get("ok"):
         log("오늘 발송 기록이 없습니다:", today)
         return 0
-    if today.get("clip_at"):
+    if today.get("clip_at") and not os.environ.get("FORCE_CLIP"):
         # 워커 즉시호출과 GitHub 예약이 둘 다 떠도 한 번만 보낸다
         log("오늘 클립은 이미 보냈습니다:", today["clip_at"])
         return 0

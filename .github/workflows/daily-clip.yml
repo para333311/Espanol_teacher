@@ -10,6 +10,11 @@ name: 오늘 문장 클립 영상
 # 을 보고 바로 끝낸다.
 on:
   workflow_dispatch:
+    inputs:
+      force:
+        description: 오늘 이미 보냈어도 다시 찾아 보낸다 (시험용)
+        type: boolean
+        default: false
   schedule:
     # 03:40 UTC(=KST 12:40). 즉시호출이 이미 처리했으면 곧장 종료.
     - cron: '40 3 * * *'
@@ -40,4 +45,5 @@ jobs:
           ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           PYTHONUNBUFFERED: '1'
+          FORCE_CLIP: ${{ inputs.force && '1' || '' }}
         run: python scripts/daily_clip.py
