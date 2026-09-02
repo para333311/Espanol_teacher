@@ -178,16 +178,13 @@ async function broadcast(env, cfg, tg) {
     }
   }
 
-  // 클립 검색(daily-clip.yml)이 /today 로 읽어가도록 방금 나간 것을 남긴다.
+  // 클립 검색(scripts/daily_clip.py)이 /today 로 읽어가도록 방금 나간 것을 남긴다.
   if (sent > 0) {
     try {
       await saveLastSent(env.DB, kind, content);
     } catch (e) {
       console.warn("마지막 발송 기록 실패(발송은 됐음):", e.message);
     }
-    // GitHub 의 schedule 은 새 워크플로·혼잡 시간대에 그냥 안 뜨는 일이 잦다
-    // (2026-09-02 첫날 12:08 예약이 통째로 증발). 여기서 직접 띄운다.
-    await triggerClipWorkflow(env);
   }
 
   const label = kind === "word" ? content.es : content.kr;
@@ -196,36 +193,6 @@ async function broadcast(env, cfg, tg) {
       `(${progress.done}/${progress.total}, ${progress.round}회차)`,
   );
   return { sent, failed };
-}
-
-/** daily-clip.yml 을 workflow_dispatch 로 즉시 띄운다. 실패해도 발송은 끝난 뒤다. */
-async function triggerClipWorkflow(env) {
-  if (!env.GITHUB_TOKEN) {
-    console.warn("GITHUB_TOKEN 이 없어 클립 워크플로를 못 띄웁니다(예약에 맡김).");
-    return;
-  }
-  try {
-    const r = await fetch(
-      "https://api.github.com/repos/para333311/Espanol_teacher/actions/workflows/daily-clip.yml/dispatches",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${env.GITHUB_TOKEN}`,
-          Accept: "application/vnd.github+json",
-          "User-Agent": "spanish-teacher-bot",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ref: "main" }),
-      },
-    );
-    if (r.status !== 204) {
-      console.warn(`클립 워크플로 호출 실패: ${r.status} ${await r.text()}`);
-    } else {
-      console.log("클립 워크플로 호출됨");
-    }
-  } catch (e) {
-    console.warn("클립 워크플로 호출 오류:", e.message);
-  }
 }
 
 // ------------------------------------------------------------------ 명령어
@@ -445,7 +412,7 @@ export default {
       });
     }
 
-    // 오늘 나간 문장 + 발송 대상. daily-clip.yml(GitHub Actions)이 읽어
+    // 오늘 나간 문장. 로컬 PC 의 scripts/daily_clip.py 가 읽어
     // 그 문장이 나오는 유튜브 클립을 찾아 영상으로 뒤따라 보낸다.
     if (url.pathname === "/today") {
       if (!isAdmin) return new Response("forbidden", { status: 403 });
@@ -457,12 +424,33 @@ export default {
       return Response.json({ ok: true, ...last, targets: subs });
     }
 
-    // 클립(또는 못 찾았다는 알림)을 보냈다고 표시. 예약·즉시호출이 둘 다
-    // 떠도 두 번째는 /today 의 clip_at 을 보고 그냥 끝낸다.
-    if (url.pathname === "/clip-done") {
+    // 로컬 PC(scripts/daily_clip.py)가 찾아 잘라 온 클립을 구독자 전원에게
+    // 보낸다. 유튜브가 GitHub 러너 IP 를 봇으로 막아(2026-09-02) 클립 작업은
+    // 집 PC 에서 돌고, 봇 토큰은 여기만 갖고 있으니 전송은 워커가 맡는다.
+    //   multipart: video(mp4, 선택) · caption · text(영상 없을 때 보낼 한 줄)
+    // 보내고 나면 오늘 것 처리됨(clip_sent)으로 표시해 두 번 보내지 않는다.
+    if (url.pathname === "/clip" && request.method === "POST") {
       if (!isAdmin) return new Response("forbidden", { status: 403 });
-      await markClipDone(env.DB);
-      return Response.json({ ok: true });
+      const form = await request.formData();
+      const video = form.get("video");
+      const caption = String(form.get("caption") || "");
+      const text = String(form.get("text") || "");
+      const bytes = video && typeof video !== "string" ? await video.arrayBuffer() : null;
+      if (!bytes && !text) return Response.json({ ok: false, reason: "video 또는 text 필요" });
+      const subs = await listSubscribers(env.DB);
+      let sent = 0;
+      const errors = [];
+      for (const chatId of subs) {
+        try {
+          if (bytes) await tg.sendVideo(chatId, bytes, { caption });
+          else await tg.sendMessage(chatId, text);
+          sent += 1;
+        } catch (e) {
+          errors.push(`${chatId}: ${e.message}`);
+        }
+      }
+      if (sent > 0) await markClipDone(env.DB);
+      return Response.json({ ok: sent > 0, sent, errors });
     }
 
     if (url.pathname === "/status") {

@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""오늘 나간 스페인어 문장이 실제로 들리는 유튜브 클립을 찾아 영상으로 보낸다.
+"""오늘 나간 스페인어 문장(또는 단어)이 실제로 들리는 유튜브 클립을 찾아 보낸다.
 
-흐름 (매일 12시 KST 카드 발송 뒤, daily-clip.yml 이 실행):
-  1. 워커의 /today 로 오늘 문장과 발송 대상을 받는다
+집 PC 의 예약작업(매일 12:05 KST, scripts/clip_task.ps1)으로 돈다.
+GitHub Actions 에서 돌리려 했으나 유튜브가 러너 IP 를 봇으로 막아
+자막·영상을 한 건도 못 받았다(2026-09-02). 집 IP 는 잘 된다.
+
+흐름:
+  1. 워커의 /today 로 오늘 문장을 받는다 (12:00 발송이 아직이면 잠시 기다린다)
   2. 유튜브에서 그 문장을 검색해 후보 영상들의 스페인어 자막만 내려받는다
   3. 자막에서 문장(또는 핵심 구문)이 나오는 시각을 찾는다
-  4. 그 부분만 잘라 받아 텔레그램에 영상으로 보낸다
+  4. 그 부분만 잘라 받아 워커 POST /clip 으로 넘긴다 — 봇 토큰은 워커만
+     갖고 있으니 텔레그램 전송은 워커가 한다. 여기엔 ADMIN_KEY 만 있으면 된다.
 
 전체 문장이 자막에 그대로 나오는 영상은 드물다. 그래서 문장 → parts 의
-긴 조각 순서로 눈높이를 낮춰가며 찾는다. 그래도 없으면 조용히 실패를
+긴 조각 순서로 눈높이를 낮춰가며 찾는다. 그래도 없으면 못 찾았다고 한 줄만
 알린다 — TTS 로 되돌아가지 않는다(mp3 는 그만 보내기로 했다).
 
-개인 학습용 채널(구독자 2명) 전용이다.
+ADMIN_KEY 는 환경변수 또는 저장소의 .dev.vars(ADMIN_KEY=...) 에서 읽는다.
 """
 
+import datetime
 import glob
 import html
 import json
@@ -22,6 +28,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 import unicodedata
 import urllib.parse
 import urllib.request
@@ -33,58 +40,55 @@ PAD_BEFORE = 1.5         # 대사 앞 여유(초)
 PAD_AFTER = 2.0          # 대사 뒤 여유(초)
 MIN_CLIP = 4.0           # 클립 최소 길이(초)
 MAX_CLIP = 20.0          # 클립 최대 길이(초)
-WORKDIR = "clip_work"
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+WORKDIR = os.path.join(REPO, "state", "clip_work")
+WAIT_FOR_CARD_MIN = 20   # 12:00 카드가 아직 안 나갔으면 이만큼 기다린다(분)
+KST = datetime.timezone(datetime.timedelta(hours=9))
 
 
 def log(*a):
     print(*a, flush=True)
 
 
-def api(path):
-    key = os.environ["ADMIN_KEY"].strip()
-    sep = "&" if "?" in path else "?"
-    url = "%s%s%skey=%s" % (WORKER, path, sep, urllib.parse.quote(key))
-    # Cloudflare 가 Python-urllib 기본 UA 를 봇 서명으로 막는다(403, error 1010)
-    req = urllib.request.Request(url, headers={"User-Agent": "spanish-clip-bot/1.0"})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.load(r)
-
-
-def clip_done():
-    """오늘 것은 처리됐다고 워커에 표시 — 예비 예약이 같은 걸 또 보내지 않게."""
+def admin_key():
+    key = os.environ.get("ADMIN_KEY", "").strip()
+    if key:
+        return key
     try:
-        api("/clip-done")
-    except Exception as e:
-        log("clip-done 표시 실패:", e)
+        for line in open(os.path.join(REPO, ".dev.vars"), encoding="utf-8"):
+            if line.startswith("ADMIN_KEY="):
+                return line.split("=", 1)[1].strip()
+    except OSError:
+        pass
+    raise SystemExit("ADMIN_KEY 가 없습니다 (환경변수 또는 .dev.vars)")
 
 
-def tg(method, data, files=None):
-    """텔레그램 Bot API 호출. files 는 {필드: (파일명, bytes)}."""
-    token = os.environ["TELEGRAM_BOT_TOKEN"].strip()
-    url = "https://api.telegram.org/bot%s/%s" % (token, method)
-    if not files:
-        body = urllib.parse.urlencode(data).encode()
-        req = urllib.request.Request(url, data=body)
-    else:
+def api(path, data=None, files=None):
+    """워커 관리 엔드포인트 호출. files 는 {필드: (파일명, bytes)} → multipart POST."""
+    sep = "&" if "?" in path else "?"
+    url = "%s%s%skey=%s" % (WORKER, path, sep, urllib.parse.quote(admin_key()))
+    # Cloudflare 가 Python-urllib 기본 UA 를 봇 서명으로 막는다(403, error 1010)
+    headers = {"User-Agent": "spanish-clip-bot/1.0"}
+    body = None
+    if files or data:
         boundary = "----clipbound7259"
         parts = []
-        for k, v in data.items():
+        for k, v in (data or {}).items():
             parts.append(
                 ("--%s\r\nContent-Disposition: form-data; name=\"%s\"\r\n\r\n%s\r\n"
                  % (boundary, k, v)).encode()
             )
-        for k, (fname, blob) in files.items():
+        for k, (fname, blob) in (files or {}).items():
             parts.append(
                 ("--%s\r\nContent-Disposition: form-data; name=\"%s\"; "
                  "filename=\"%s\"\r\nContent-Type: video/mp4\r\n\r\n"
                  % (boundary, k, fname)).encode() + blob + b"\r\n"
             )
         parts.append(("--%s--\r\n" % boundary).encode())
-        req = urllib.request.Request(
-            url, data=b"".join(parts),
-            headers={"Content-Type": "multipart/form-data; boundary=" + boundary},
-        )
-    with urllib.request.urlopen(req, timeout=120) as r:
+        body = b"".join(parts)
+        headers["Content-Type"] = "multipart/form-data; boundary=" + boundary
+    req = urllib.request.Request(url, data=body, headers=headers)
+    with urllib.request.urlopen(req, timeout=180) as r:
         return json.load(r)
 
 
@@ -242,25 +246,46 @@ def cut_clip(video_id, start, end, out_path):
 
 # ------------------------------------------------------------------ 메인
 
+def wait_for_today_card():
+    """오늘(KST) 12:00 카드가 나갔는지 /today 로 확인. 아직이면 잠시 기다린다.
+
+    워커 cron 이 몇 분 늦을 수 있고, 예약작업이 정각보다 먼저 뜰 수도 있다.
+    """
+    today_kst = datetime.datetime.now(KST).date()
+    deadline = time.time() + WAIT_FOR_CARD_MIN * 60
+    while True:
+        today = api("/today")
+        sent = today.get("sent_at") if today.get("ok") else None
+        if sent:
+            # D1 의 datetime('now') 는 UTC
+            d = datetime.datetime.strptime(sent, "%Y-%m-%d %H:%M:%S")
+            d = d.replace(tzinfo=datetime.timezone.utc).astimezone(KST).date()
+            if d == today_kst or os.environ.get("FORCE_CLIP"):
+                return today
+        if time.time() > deadline:
+            log("오늘 카드가 아직 안 나갔습니다 (마지막 발송: %s). 포기." % sent)
+            return None
+        log("오늘 카드를 기다리는 중 (마지막 발송: %s)" % sent)
+        time.sleep(60)
+
+
 def main():
     os.makedirs(WORKDIR, exist_ok=True)
 
-    today = api("/today")
-    if not today.get("ok"):
-        log("오늘 발송 기록이 없습니다:", today)
-        return 0
+    today = wait_for_today_card()
+    if not today:
+        return 1
     if today.get("clip_at") and not os.environ.get("FORCE_CLIP"):
-        # 워커 즉시호출과 GitHub 예약이 둘 다 떠도 한 번만 보낸다
+        # 예약작업이 재시도로 여러 번 떠도 한 번만 보낸다
         log("오늘 클립은 이미 보냈습니다:", today["clip_at"])
         return 0
     content = today["content"]
-    targets = today.get("targets") or []
     es = content.get("es", "")
     # 문장 카드는 ko, 단어 카드는 ko_reading 에 뜻이 있다
     ko = content.get("ko") or content.get("ko_reading") or ""
     log("오늘의 %s:" % ("단어" if today.get("kind") == "word" else "문장"), es)
-    if not es or not targets:
-        log("문장 또는 발송 대상이 없어 종료")
+    if not es:
+        log("문장이 비어 있어 종료")
         return 0
 
     terms = search_terms(content)
@@ -292,15 +317,11 @@ def main():
         log("자막에서 구문을 찾지 못했습니다. 오늘은 영상 없이 넘어갑니다.")
         # 개인 채널이므로 실패도 짧게 알린다 — 조용히 사라지면 영상이 왜
         # 안 왔는지 알 수 없다.
-        for t in targets:
-            try:
-                tg("sendMessage", {
-                    "chat_id": t,
-                    "text": "🎬 오늘 문장이 나오는 클립을 못 찾았습니다: %s" % es,
-                })
-            except Exception as e:
-                log("실패 알림 전송 실패:", e)
-        clip_done()
+        try:
+            r = api("/clip", {"text": "🎬 오늘 문장이 나오는 클립을 못 찾았습니다: %s" % es})
+            log("알림:", r)
+        except Exception as e:
+            log("실패 알림 전송 실패:", e)
         return 0
 
     vid, start, end, term = found
@@ -319,15 +340,13 @@ def main():
 
     blob = open(out, "rb").read()
     caption = "🎬 %s\n%s" % (es, ko)
-    for t in targets:
-        try:
-            r = tg("sendVideo", {"chat_id": t, "caption": caption},
-                   files={"video": ("clip.mp4", blob)})
-            log("전송:", t, r.get("ok"))
-        except Exception as e:
-            log("전송 실패 (%s): %s" % (t, e))
-    clip_done()
-    return 0
+    try:
+        r = api("/clip", {"caption": caption}, files={"video": ("clip.mp4", blob)})
+        log("전송:", r)
+        return 0 if r.get("ok") else 1
+    except Exception as e:
+        log("전송 실패:", e)
+        return 1
 
 
 if __name__ == "__main__":

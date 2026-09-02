@@ -75,6 +75,20 @@ export class Telegram {
     return body.result;
   }
 
+  /** 클립 영상 전송. bytes 는 mp4(h264+aac) — 텔레그램이 인라인 재생한다. */
+  async sendVideo(chatId, bytes, { caption = "" } = {}) {
+    const form = new FormData();
+    form.append("chat_id", String(chatId));
+    if (caption) form.append("caption", caption);
+    form.append("video", new Blob([bytes], { type: "video/mp4" }), "clip.mp4");
+    const res = await fetch(`${this.base}/sendVideo`, { method: "POST", body: form });
+    const body = await res.json().catch(() => ({}));
+    if (!body.ok) {
+      throw new Error(`sendVideo 실패: ${body.description || res.status}`);
+    }
+    return body.result;
+  }
+
   setWebhook(url, secretToken) {
     return this.call("setWebhook", {
       url,
