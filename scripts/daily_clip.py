@@ -44,7 +44,9 @@ def api(path):
     key = os.environ["ADMIN_KEY"].strip()
     sep = "&" if "?" in path else "?"
     url = "%s%s%skey=%s" % (WORKER, path, sep, urllib.parse.quote(key))
-    with urllib.request.urlopen(url, timeout=30) as r:
+    # Cloudflare 가 Python-urllib 기본 UA 를 봇 서명으로 막는다(403, error 1010)
+    req = urllib.request.Request(url, headers={"User-Agent": "spanish-clip-bot/1.0"})
+    with urllib.request.urlopen(req, timeout=30) as r:
         return json.load(r)
 
 
