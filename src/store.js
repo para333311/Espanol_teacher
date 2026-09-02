@@ -183,12 +183,33 @@ export async function saveLastSent(db, kind, content) {
 
 export async function getLastSent(db) {
   const row = await db
-    .prepare("SELECT kind, content_json, sent_at FROM last_sent WHERE id = 1")
+    .prepare(
+      "SELECT l.kind, l.content_json, l.sent_at, c.clip_at " +
+        "FROM last_sent l LEFT JOIN clip_sent c " +
+        "ON c.id = 1 AND c.for_sent_at = l.sent_at WHERE l.id = 1",
+    )
     .first();
   if (!row) return null;
   try {
-    return { kind: row.kind, content: JSON.parse(row.content_json), sent_at: row.sent_at };
+    return {
+      kind: row.kind,
+      content: JSON.parse(row.content_json),
+      sent_at: row.sent_at,
+      clip_at: row.clip_at || null,
+    };
   } catch {
     return null;
   }
+}
+
+/** 오늘 것의 클립 영상(또는 못 찾았다는 알림)이 나갔다고 표시한다. */
+export async function markClipDone(db) {
+  await db
+    .prepare(
+      "INSERT INTO clip_sent (id, for_sent_at, clip_at) " +
+        "SELECT 1, sent_at, datetime('now') FROM last_sent WHERE id = 1 " +
+        "ON CONFLICT(id) DO UPDATE SET for_sent_at = excluded.for_sent_at, " +
+        "clip_at = excluded.clip_at",
+    )
+    .run();
 }

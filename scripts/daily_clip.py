@@ -48,6 +48,14 @@ def api(path):
         return json.load(r)
 
 
+def clip_done():
+    """오늘 것은 처리됐다고 워커에 표시 — 예비 예약이 같은 걸 또 보내지 않게."""
+    try:
+        api("/clip-done")
+    except Exception as e:
+        log("clip-done 표시 실패:", e)
+
+
 def tg(method, data, files=None):
     """텔레그램 Bot API 호출. files 는 {필드: (파일명, bytes)}."""
     token = os.environ["TELEGRAM_BOT_TOKEN"].strip()
@@ -93,7 +101,12 @@ def norm(s):
 
 
 def search_terms(content):
-    """찾을 구문을 눈높이 순서로. 전체 문장 → parts 중 긴 것 순."""
+    """찾을 구문을 눈높이 순서로. 전체 문장 → parts 중 긴 것 순.
+
+    단어 카드(kind=word)는 es 가 한 단어뿐이고 parts 가 없다. 그 단어가
+    실제로 들리는 자리를 찾는 게 목적이므로 한 단어 그대로 찾는다 —
+    find_in_cues 가 단어 경계로 대조하니 'rebaja' 가 'rebajas' 에 걸리지 않는다.
+    """
     terms = []
     es = (content.get("es") or "").strip()
     if es:
@@ -176,17 +189,22 @@ def parse_vtt(path):
 
 
 def find_in_cues(cues, needle):
-    """이웃 큐 두세 개를 이어붙여도 찾는다 — 대사가 줄로 쪼개져 있는 게 보통이다."""
+    """이웃 큐 두세 개를 이어붙여도 찾는다 — 대사가 줄로 쪼개져 있는 게 보통이다.
+
+    단어 경계로 대조한다: 정규화된 텍스트는 공백 구분뿐이라 양쪽에 공백을
+    붙여 보면 된다.
+    """
+    pad = " " + needle + " "
     for i in range(len(cues)):
         joined = cues[i][2]
         end = cues[i][1]
         for j in (i + 1, i + 2):
-            if needle in joined:
+            if pad in " " + joined + " ":
                 return cues[i][0], end
             if j < len(cues):
                 joined += " " + cues[j][2]
                 end = cues[j][1]
-        if needle in joined:
+        if pad in " " + joined + " ":
             return cues[i][0], end
     return None
 
@@ -224,10 +242,16 @@ def main():
     if not today.get("ok"):
         log("오늘 발송 기록이 없습니다:", today)
         return 0
+    if today.get("clip_at"):
+        # 워커 즉시호출과 GitHub 예약이 둘 다 떠도 한 번만 보낸다
+        log("오늘 클립은 이미 보냈습니다:", today["clip_at"])
+        return 0
     content = today["content"]
     targets = today.get("targets") or []
     es = content.get("es", "")
-    log("오늘의 문장:", es)
+    # 문장 카드는 ko, 단어 카드는 ko_reading 에 뜻이 있다
+    ko = content.get("ko") or content.get("ko_reading") or ""
+    log("오늘의 %s:" % ("단어" if today.get("kind") == "word" else "문장"), es)
     if not es or not targets:
         log("문장 또는 발송 대상이 없어 종료")
         return 0
@@ -269,6 +293,7 @@ def main():
                 })
             except Exception as e:
                 log("실패 알림 전송 실패:", e)
+        clip_done()
         return 0
 
     vid, start, end, term = found
@@ -286,7 +311,7 @@ def main():
         return 1
 
     blob = open(out, "rb").read()
-    caption = "🎬 %s\n%s" % (es, content.get("ko", ""))
+    caption = "🎬 %s\n%s" % (es, ko)
     for t in targets:
         try:
             r = tg("sendVideo", {"chat_id": t, "caption": caption},
@@ -294,6 +319,7 @@ def main():
             log("전송:", t, r.get("ok"))
         except Exception as e:
             log("전송 실패 (%s): %s" % (t, e))
+    clip_done()
     return 0
 
 

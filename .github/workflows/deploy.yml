@@ -119,11 +119,19 @@ jobs:
           TG: ${{ env.TELEGRAM_BOT_TOKEN }}
           WH: ${{ env.WEBHOOK_SECRET }}
           AK: ${{ env.ADMIN_KEY }}
+          GH: ${{ secrets.GH_DISPATCH_TOKEN }}
         run: |
           set -euo pipefail
           printf '%s' "$TG" | npx wrangler secret put TELEGRAM_BOT_TOKEN
           printf '%s' "$WH" | npx wrangler secret put WEBHOOK_SECRET
           printf '%s' "$AK" | npx wrangler secret put ADMIN_KEY
+          # 카드 발송 직후 daily-clip.yml 을 띄우는 데 쓰는 GitHub 토큰(repo+workflow).
+          # 없으면 워커가 경고만 남기고 GitHub 예약(예비)에 맡긴다.
+          if [ -n "$GH" ]; then
+            printf '%s' "$GH" | npx wrangler secret put GITHUB_TOKEN
+          else
+            echo "GH_DISPATCH_TOKEN 없음 — 클립 즉시호출은 꺼진 채 배포"
+          fi
 
       # 배포 후 텔레그램 웹훅을 새 주소로 다시 걸어준다.
       #

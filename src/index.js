@@ -8,6 +8,7 @@ import { formatHelp, formatLesson, formatStart, formatStats, formatWord } from "
 import {
   addSubscriber,
   getLastSent,
+  markClipDone,
   getProgress,
   getWordProgress,
   listSubscribers,
@@ -184,6 +185,9 @@ async function broadcast(env, cfg, tg) {
     } catch (e) {
       console.warn("마지막 발송 기록 실패(발송은 됐음):", e.message);
     }
+    // GitHub 의 schedule 은 새 워크플로·혼잡 시간대에 그냥 안 뜨는 일이 잦다
+    // (2026-09-02 첫날 12:08 예약이 통째로 증발). 여기서 직접 띄운다.
+    await triggerClipWorkflow(env);
   }
 
   const label = kind === "word" ? content.es : content.kr;
@@ -192,6 +196,36 @@ async function broadcast(env, cfg, tg) {
       `(${progress.done}/${progress.total}, ${progress.round}회차)`,
   );
   return { sent, failed };
+}
+
+/** daily-clip.yml 을 workflow_dispatch 로 즉시 띄운다. 실패해도 발송은 끝난 뒤다. */
+async function triggerClipWorkflow(env) {
+  if (!env.GITHUB_TOKEN) {
+    console.warn("GITHUB_TOKEN 이 없어 클립 워크플로를 못 띄웁니다(예약에 맡김).");
+    return;
+  }
+  try {
+    const r = await fetch(
+      "https://api.github.com/repos/para333311/Espanol_teacher/actions/workflows/daily-clip.yml/dispatches",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.GITHUB_TOKEN}`,
+          Accept: "application/vnd.github+json",
+          "User-Agent": "spanish-teacher-bot",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ref: "main" }),
+      },
+    );
+    if (r.status !== 204) {
+      console.warn(`클립 워크플로 호출 실패: ${r.status} ${await r.text()}`);
+    } else {
+      console.log("클립 워크플로 호출됨");
+    }
+  } catch (e) {
+    console.warn("클립 워크플로 호출 오류:", e.message);
+  }
 }
 
 // ------------------------------------------------------------------ 명령어
@@ -421,6 +455,14 @@ export default {
       ]);
       if (!last) return Response.json({ ok: false, reason: "발송 기록 없음" });
       return Response.json({ ok: true, ...last, targets: subs });
+    }
+
+    // 클립(또는 못 찾았다는 알림)을 보냈다고 표시. 예약·즉시호출이 둘 다
+    // 떠도 두 번째는 /today 의 clip_at 을 보고 그냥 끝낸다.
+    if (url.pathname === "/clip-done") {
+      if (!isAdmin) return new Response("forbidden", { status: 403 });
+      await markClipDone(env.DB);
+      return Response.json({ ok: true });
     }
 
     if (url.pathname === "/status") {
