@@ -99,11 +99,24 @@ export function formatWord(w, { progress = null } = {}) {
   return L.join("\n");
 }
 
+/**
+ * 발송 주기를 사람 말로.
+ *
+ * 2026-09-01 부터 cron 이 "0 3 * * *" — 하루 한 번 낮 12시(KST)다. 그런데 안내
+ * 문구는 INTERVAL_HOURS 를 그대로 "N시간마다" 로 읽어, 값이 3 인 채로 남아
+ * "3시간마다" 라고 거짓말하고 있었다. 24 로 고쳐도 "24시간마다" 는 굴러가는
+ * 24시간처럼 들려 여전히 틀리다 — 실제로는 시계 시각이 박혀 있다.
+ * 하루 한 번이면 시각을 말하고, 그보다 잦으면 예전처럼 주기를 말한다.
+ */
+export function cycleText(intervalHours) {
+  return intervalHours >= 24 ? "하루 한 번 낮 12시에" : `${intervalHours}시간마다`;
+}
+
 export function formatHelp(intervalHours) {
   return [
     "🇪🇸 <b>생활 스페인어 봇</b>",
     "",
-    `${intervalHours}시간마다 스페인어 한 문장을 보내드려요.`,
+    `${cycleText(intervalHours)} 스페인어 한 문장을 보내드려요.`,
     "한글 발음 그대로 소리 내어 읽으면 됩니다.",
     "",
     "<b>명령어</b>",
@@ -121,7 +134,7 @@ export function formatStart(intervalHours) {
   return [
     "✅ <b>등록 완료!</b>",
     "",
-    `이제 <b>${intervalHours}시간</b>마다 스페인어 한 문장을 보내드릴게요.`,
+    `이제 <b>${cycleText(intervalHours)}</b> 스페인어 한 문장을 보내드릴게요.`,
     "밤에는 알림이 가지 않으니 안심하세요. 🌙",
     "",
     "지금 바로 받아보려면 /now 를 눌러보세요.",
@@ -137,6 +150,6 @@ export function formatStats(phrase, word, intervalHours) {
     `🗣 문장: <b>${phrase.done}</b> / ${phrase.total} (${pPct}%) · ${phrase.round}회차`,
     `📖 단어: <b>${word.done}</b> / ${word.total} (${wPct}%) · ${word.round}회차`,
     "",
-    `발송 주기: ${intervalHours}시간마다`,
+    `발송 주기: ${cycleText(intervalHours)}`,
   ].join("\n");
 }

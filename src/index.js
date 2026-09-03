@@ -4,7 +4,7 @@
 //   fetch()     : 텔레그램 웹훅 수신 → 명령어 즉시 응답
 //   scheduled() : Cron 트리거 → 정기 발송
 
-import { formatHelp, formatLesson, formatStart, formatStats, formatWord } from "./format.js";
+import { cycleText, formatHelp, formatLesson, formatStart, formatStats, formatWord } from "./format.js";
 import {
   addSubscriber,
   getLastSent,
@@ -306,7 +306,7 @@ async function handleUpdate(env, cfg, tg, update) {
         await tg.sendMessage(
           chatId,
           "✅ 여기로 스페인어 문장을 보내겠습니다.\n" +
-            `${cfg.intervalHours}시간마다 한 문장씩 올라갑니다.`,
+            `${cycleText(cfg.intervalHours)} 한 문장씩 올라갑니다.`,
         );
       }
     } else if (status === "left" || status === "kicked") {

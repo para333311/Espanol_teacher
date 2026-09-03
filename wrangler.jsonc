@@ -21,7 +21,9 @@
   ],
 
   "vars": {
-    "INTERVAL_HOURS": "3",
+    // 안내 문구 전용 — 실제 발송은 위 crons 가 한다(하루 1회 낮 12시).
+    // 24 이상이면 문구가 "하루 한 번 낮 12시에" 로 바뀐다 (format.js cycleText).
+    "INTERVAL_HOURS": "24",
     "TIMEZONE": "Asia/Seoul",
     "QUIET_ENABLED": "true",
     "QUIET_START_HOUR": "0",
