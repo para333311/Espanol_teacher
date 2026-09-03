@@ -204,19 +204,21 @@ def find_in_cues(cues, needle):
 
     단어 경계로 대조한다: 정규화된 텍스트는 공백 구분뿐이라 양쪽에 공백을
     붙여 보면 된다.
+
+    묶음 크기를 1 → 2 → 3 순으로 넓혀 가며 본다. 전에는 시작 큐를 바깥 고리로
+    두고 그 자리에서 1~3개를 이어붙였는데, 그러면 **한 큐에 다 들어 있는 말도
+    두세 큐 앞에서 먼저 걸려** 시작 시각이 몇 초씩 앞으로 밀렸다(일본어판 실측:
+    5.4초짜리 대사가 2.0초로 보고됨). 클립이 대사보다 일찍 시작해 앞에 엉뚱한
+    말이 붙는다. 작은 묶음을 먼저 보면 그 말이 실제로 나오는 큐가 잡힌다.
     """
+    if not needle:
+        return None
     pad = " " + needle + " "
-    for i in range(len(cues)):
-        joined = cues[i][2]
-        end = cues[i][1]
-        for j in (i + 1, i + 2):
+    for span in (1, 2, 3):
+        for i in range(len(cues) - span + 1):
+            joined = " ".join(c[2] for c in cues[i:i + span])
             if pad in " " + joined + " ":
-                return cues[i][0], end
-            if j < len(cues):
-                joined += " " + cues[j][2]
-                end = cues[j][1]
-        if pad in " " + joined + " ":
-            return cues[i][0], end
+                return cues[i][0], cues[i + span - 1][1]
     return None
 
 
